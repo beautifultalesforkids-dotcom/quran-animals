@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لعبة حكايات الحيوانات في القرآن</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600;800&family=Lalezar&display=swap" rel="stylesheet">
+<style>
+:root{--night:#2b2a6b;--night2:#4a3f9f;--sun:#ff9f43;--mint:#2ec4b6;--sand:#fff1c1;--coral:#ff6b6b;--ink:#26244f;--ok:#2fbf71}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Cairo',Tahoma,sans-serif;color:var(--ink);background:linear-gradient(180deg,#2b2a6b 0%,#5b46b8 45%,#ff9f43 130%);background-attachment:fixed;overflow-x:hidden}
+#sky{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+.fl{position:absolute;bottom:-60px;font-size:34px;opacity:.28;animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-115vh) rotate(25deg)}}
+.star{position:absolute;width:4px;height:4px;border-radius:50%;background:#fff;animation:tw 2.5s ease-in-out infinite}
+@keyframes tw{50%{opacity:.15;transform:scale(.6)}}
+#app{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:14px 14px 40px;min-height:100%}
+h1,h2,.disp{font-family:'Lalezar','Cairo',sans-serif;font-weight:400}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#fff;margin-bottom:10px}
+.chip{background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.35);border-radius:999px;padding:4px 14px;font-weight:800;font-size:17px;color:#fff}
+button{font-family:inherit;cursor:pointer}
+button:focus-visible{outline:4px solid #fff;outline-offset:3px}
+#snd{background:rgba(255,255,255,.18);border:2px solid rgba(255,255,255,.35);border-radius:50%;width:44px;height:44px;font-size:22px;color:#fff}
+.screen{display:none}.screen.on{display:block}
+/* home */
+.hero{text-align:center;color:#fff;padding:10px 0 18px}
+.hero .row{font-size:54px;letter-spacing:6px;animation:sway 3s ease-in-out infinite}
+@keyframes sway{50%{transform:translateY(-8px) rotate(-3deg)}}
+.hero h1{font-size:clamp(36px,9vw,58px);line-height:1.25;color:var(--sand);text-shadow:0 4px 0 #ff9f43,0 8px 18px rgba(0,0,0,.3)}
+.hero p{font-size:19px;font-weight:600;margin-top:6px}
+.levels{display:grid;gap:14px;margin-top:8px}
+.lv{display:flex;align-items:center;gap:14px;border:0;border-radius:26px;padding:16px 20px;color:#fff;text-align:right;box-shadow:0 8px 0 rgba(0,0,0,.25);transition:transform .15s}
+.lv:hover{transform:translateY(-3px) scale(1.02)}.lv:active{transform:translateY(4px);box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.lv .ic{font-size:50px;background:rgba(255,255,255,.25);border-radius:50%;width:74px;height:74px;display:grid;place-items:center;flex:none}
+.lv b{font-family:'Lalezar';font-weight:400;font-size:30px;display:block;line-height:1.1}
+.lv span{font-size:16px;font-weight:600}
+.lv .best{margin-inline-start:auto;font-size:22px;letter-spacing:2px}
+.link{display:block;text-align:center;margin-top:22px;color:#fff;font-weight:800;font-size:17px}
+/* game */
+.bar{height:14px;background:rgba(255,255,255,.25);border-radius:9px;overflow:hidden;margin-bottom:6px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--mint),#8aeaa8);border-radius:9px;transition:width .5s}
+#tm{height:10px;margin-bottom:10px;opacity:0}
+#tm i{background:linear-gradient(90deg,var(--coral),var(--sun));transition:none}
+.card{background:var(--sand);border-radius:30px;padding:22px 18px 20px;box-shadow:0 10px 0 rgba(0,0,0,.22);text-align:center;position:relative}
+.badge{width:130px;height:130px;margin:-64px auto 8px;border-radius:50%;background:#fff;border:6px solid var(--sun);display:grid;place-items:center;font-size:74px;box-shadow:0 6px 0 rgba(0,0,0,.2);animation:bob 2.2s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px) scale(1.05)}}
+.q{font-family:'Lalezar';font-size:clamp(24px,6vw,32px);line-height:1.5;margin:6px 4px 16px}
+.opts{display:grid;gap:11px}
+.op{border:0;border-radius:20px;padding:14px 16px;font-size:clamp(18px,4.6vw,22px);font-weight:800;color:#fff;box-shadow:0 6px 0 rgba(0,0,0,.25);transition:transform .12s,background .2s}
+.pb{font-family:'Cairo',Tahoma,sans-serif;font-size:.5em;font-weight:600;opacity:.9;margin-inline-start:.3em;white-space:nowrap}
+.op:nth-child(1){background:#4a8cff}.op:nth-child(2){background:#a855f7}.op:nth-child(3){background:#ec4899}.op:nth-child(4){background:#0ea5a4}
+.op:hover:not(:disabled){transform:translateY(-3px)}.op:active:not(:disabled){transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.op:disabled{cursor:default}
+.op.ok{background:var(--ok)!important;animation:pop .5s}
+.op.no{background:#d94c4c!important;animation:shake .45s}
+.op.dim{opacity:.45}
+@keyframes pop{40%{transform:scale(1.07)}}
+@keyframes shake{25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
+#fb{display:none;margin-top:16px;border-radius:20px;padding:12px 14px;font-weight:700;font-size:18px;line-height:1.6;background:#fff}
+#fb.good{border:3px solid var(--ok)}#fb.bad{border:3px solid var(--coral)}
+#fb b{font-family:'Lalezar';font-weight:400;font-size:24px;display:block}
+#nx{display:none;margin:14px auto 0;border:0;border-radius:999px;padding:12px 38px;font-family:'Lalezar';font-size:26px;background:var(--sun);color:#fff;box-shadow:0 6px 0 #c9711a}
+#nx:active{transform:translateY(4px);box-shadow:0 2px 0 #c9711a}
+.pts{position:absolute;top:10px;left:14px;font-weight:800;font-size:19px;color:var(--night)}
+.streak{position:absolute;top:10px;right:14px;font-weight:800;font-size:19px;color:#d9480f;transition:transform .2s}
+/* end */
+.end{text-align:center;color:#fff;padding-top:14px}
+.end h2{font-size:clamp(36px,9vw,54px);color:var(--sand);text-shadow:0 4px 0 var(--sun)}
+.stars{font-size:70px;margin:10px 0;letter-spacing:6px}
+.stars span{display:inline-block;opacity:0;transform:scale(.2) rotate(-60deg);animation:st .6s forwards}
+@keyframes st{to{opacity:1;transform:none}}
+.end p{font-size:21px;font-weight:700;margin:4px 0}
+.btns{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:20px}
+.btns button{border:0;border-radius:999px;padding:12px 26px;font-family:'Lalezar';font-size:24px;color:#fff;box-shadow:0 6px 0 rgba(0,0,0,.25)}
+#cv{position:fixed;inset:0;pointer-events:none;z-index:5}
+@media(min-width:560px){.opts{grid-template-columns:1fr 1fr}.levels{gap:16px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="sky"></div>
+<canvas id="cv"></canvas>
+<div id="app">
+  <div class="top">
+    <button id="snd" aria-label="تشغيل أو إيقاف الصوت">🔊</button>
+    <span class="chip" id="lvName" style="visibility:hidden"></span>
+    <span class="chip" id="tot">⭐ 0</span>
+  </div>
+
+  <section class="screen on" id="home">
+    <div class="hero">
+      <div class="row">🐏🐦🐜🐋🐘</div>
+      <h1>حكايات الحيوانات في القرآن</h1>
+      <p>اختر مستواك وابدأ المغامرة!</p>
+    </div>
+    <div class="levels" id="levels"></div>
+    <a class="link" href="https://www.story2kids.com/2026/10/quran-animal-stories.html" target="_blank" rel="noopener">📚 اقرأ قصص السلسلة على موقع قصة لطفلك</a>
+  </section>
+
+  <section class="screen" id="game">
+    <div class="bar"><i id="pg"></i></div>
+    <div class="bar" id="tm"><i id="tmi"></i></div>
+    <div style="height:70px"></div>
+    <div class="card">
+      <div class="pts" id="pts">0</div>
+      <div class="streak" id="stk"></div>
+      <div class="badge" id="em"></div>
+      <div class="q" id="q"></div>
+      <div class="opts" id="opts"></div>
+      <div id="fb"></div>
+      <button id="nx">التالي ◀</button>
+    </div>
+  </section>
+
+  <section class="screen" id="end">
+    <div class="end">
+      <h2 id="eT"></h2>
+      <div class="stars" id="eS"></div>
+      <p id="eM"></p>
+      <p id="eP"></p>
+      <div class="btns">
+        <button id="again" style="background:var(--mint)">🔄 العب مرة أخرى</button>
+        <button id="nextLv" style="background:var(--sun)">🚀 المستوى التالي</button>
+        <button id="menu" style="background:#7c6be0">🏠 القائمة</button>
+      </div>
+      <a class="link" href="https://www.story2kids.com/2026/10/quran-animal-stories.html" target="_blank" rel="noopener">📚 اقرأ القصص مع أسرتك</a>
+    </div>
+  </section>
+</div>
+
+<script>
+// [إيموجي, السؤال, الخيارات (الأولى صحيحة), المعلومة]
+const LV={
+easy:{n:'سهل',ic:'🌱',d:'١٥ سؤالًا · ٣ خيارات · بدون وقت',c:'#2ec4b6',t:0,qs:[
+['🐦','من الطائر الذي جاء بخبر ملكة سبأ إلى النبي سليمان؟',['الهدهد','الغراب','الحمامة'],'الهدهد طائر أمين أخبر سليمان بخبر سبأ.'],
+['🐜','ما الحشرة التي حذّرت قومها من جنود سليمان؟',['النملة','النحلة','الفراشة'],'النملة الحكيمة قالت: ادخلوا مساكنكم!'],
+['🐋','ما الحيوان البحري الذي التقم النبي يونس؟',['الحوت','السلحفاة','الأخطبوط'],'نجّاه الله من بطن الحوت لأنه سبّح الله.'],
+['🐦‍⬛','من الطائر الذي علّم ابن آدم كيف يدفن أخاه؟',['الغراب','الهدهد','الحمامة'],'الغراب بحث في الأرض فتعلّم ابن آدم منه.'],
+['🐏','ما الحيوان الذي فدى الله به إسماعيل؟',['الكبش','البقرة','الحمار'],'فداه الله بذبحٍ عظيم، وهو كبش من السماء.'],
+['🐕','ما الحيوان الذي كان مع فتية أصحاب الكهف؟',['الكلب','القط','الحصان'],'كلبهم الوفي بقي معهم عند باب الكهف.'],
+['🐘','ما الحيوان الكبير الذي جاء به أبرهة ليهدم الكعبة؟',['الفيل','الجمل','الحصان'],'حمى الله الكعبة من جيش الفيل.'],
+['🐄','ما الحيوان الذي أمر الله بني إسرائيل بذبحه؟',['البقرة','الناقة','الكبش'],'ومنها اسم أطول سورة في القرآن: البقرة.'],
+['🫏','ما الحيوان الذي كان مع الرجل الذي أماته الله مئة عام ثم أحياه؟',['الحمار','الجمل','الحصان'],'أراه الله قدرته حين أحيا الرجل وحماره.'],
+['🐦','ماذا أرسل الله على جيش أبرهة؟',['طيرًا أبابيل','ريحًا','ماءً'],'طيور صغيرة كثيرة رمتهم بحجارة من سجّيل.'],
+['🐜','أين طلبت النملة من قومها أن يدخلوا؟',['مساكنهم','البحر','الجبل'],'لكي لا يحطمهم سليمان وجنوده.'],
+['🐋','من النبي الذي ابتلعه الحوت؟',['يونس','موسى','نوح'],'ويُلقَّب بذي النون وصاحب الحوت.'],
+['🐜','من النبي الذي كان يفهم كلام الطير والنمل؟',['سليمان','موسى','إبراهيم'],'علّمه الله منطق الطير.'],
+['🐘','أي سورة سُمّيت باسم الفيل؟',['الفيل','الفلق','الكوثر'],'تحكي قصة أصحاب الفيل.'],
+['🐜','أي سورة سُمّيت باسم النمل؟',['النمل','النحل','الفيل'],'وفيها قصة النملة والهدهد مع سليمان.']]},
+medium:{n:'متوسط',ic:'🌟',d:'١٥ سؤالًا · ٤ خيارات',c:'#ff9f43',t:0,qs:[
+['🐘','بماذا رمت الطيور جيش أبرهة صاحب الفيل؟',['بحجارة من سجّيل','بالماء','بالنار','بالرمل'],'فجعلهم الله كعصفٍ مأكول.'],
+['🐦','ما اسم المملكة التي أخبر الهدهد سليمان عنها؟',['سبأ','مصر','بابل','روما'],'ملكة سبأ آمنت بالله مع سليمان.'],
+['🐄','ما لون البقرة التي وصفها الله لبني إسرائيل؟',['صفراء','سوداء','بيضاء','حمراء'],'صفراء فاقع لونها تسرّ الناظرين.'],
+['🐋','كيف خرج يونس من بطن الحوت؟',['ألقاه الحوت على الشاطئ بأمر الله','سبح بنفسه','أخرجه صياد','شقّ الحوت بيده'],'ثم أنبت الله عليه شجرة من يقطين.'],
+['🐕','أي فتية رافقهم الكلب في قصتهم؟',['أصحاب الكهف','أصحاب السفينة','أصحاب الأخدود','قوم عاد'],'كان كلبهم باسطًا ذراعيه بالوصيد.'],
+['🐜','لماذا طلبت النملة من قومها دخول مساكنهم؟',['حتى لا يحطمهم سليمان وجنوده وهم لا يشعرون','لأن المطر نازل','لأن الليل جاء','لتخبئ الطعام'],'كانت نملة حكيمة تخاف على قومها.'],
+['🐦','ماذا طلب سليمان من الهدهد أن يفعل بالرسالة؟',['أن يُلقيها إلى ملكة سبأ وقومها','أن يخبئها','أن يحرقها','أن يعيدها إليه'],'أخذ الهدهد الرسالة إلى ملكة سبأ.'],
+['🐦‍⬛','ماذا كان الغراب يفعل في الأرض؟',['يبحث فيها','يغنّي','ينام','يأكل'],'بعثه الله ليُري ابن آدم كيف يواري أخاه.'],
+['🐏','ماذا رأى إبراهيم في المنام؟',['أنه يذبح ابنه','أنه يسافر','أنه يبني بيتًا','أنه يزرع'],'فأطاع الله هو وابنه، ففداه الله بذبحٍ عظيم.'],
+['🐋','ماذا فعل يونس في بطن الحوت؟',['سبّح الله ودعاه','نام','غنّى','انتظر صامتًا'],'فاستجاب الله له ونجّاه.'],
+['🫏','كم ظنّ الرجل أنه نام قبل أن يحييه الله؟',['يومًا أو بعض يوم','مئة عام','سنة كاملة','ثلاث سنوات'],'لكنه لبث مئة عام!'],
+['🐘','ماذا أراد أبرهة أن يهدم؟',['الكعبة','المسجد الأقصى','قصرًا','بيتًا'],'الكعبة بيت الله الحرام.'],
+['🐕','أين نام الفتية مع كلبهم؟',['في الكهف','في البيت','في القصر','في السفينة'],'لجؤوا إلى الكهف هربًا بدينهم.'],
+['🐦','من الذي سأل عن الهدهد حين غاب؟',['سليمان','يوسف','نوح','داود'],'تفقّد سليمان الطير فلم يجد الهدهد.'],
+['🐄','من النبي الذي أمر قومه بذبح البقرة؟',['موسى','نوح','عيسى','يوسف'],'قال لهم: إن الله يأمركم أن تذبحوا بقرة.']]},
+hard:{n:'صعب',ic:'🔥',d:'١٥ سؤالًا · ٢٠ ثانية لكل سؤال',c:'#ef476f',t:20,qs:[
+['🫏','كم سنة أماتَ الله الرجل الذي مرّ على القرية وحماره ثم أحياه؟',['مئة عام','عشر سنوات','يومًا واحدًا','ثلاثمئة عام'],'أراه الله قدرته: نظر إلى حماره كيف يُحيا.'],
+['🐄','ماذا فعل بنو إسرائيل بالقتيل ليخبرهم من قتله؟',['ضربوه ببعض البقرة فأحياه الله','دفنوه مع البقرة','باعوا البقرة','ركبوا البقرة'],'قدرة الله عظيمة تُحيي الموتى.'],
+['🐕','في أي سورة ذُكر كلب أصحاب الكهف؟',['الكهف','النمل','الفيل','الصافات'],'سورة الكهف تحكي قصة الفتية.'],
+['🐦‍⬛','لماذا بعث الله الغراب إلى ابن آدم؟',['ليُريه كيف يواري سوأة أخيه','ليحمل له رسالة','ليأتيه بالطعام','ليدلّه على الماء'],'فندم على ما فعل بأخيه.'],
+['🐋','ما الشجرة التي أنبتها الله على يونس بعد خروجه؟',['اليقطين','النخل','الزيتون','التين'],'رحمة من الله بعد الشدّة.'],
+['🐕','كم سنة لبث أصحاب الكهف في كهفهم؟',['ثلاثمئة وتسع سنين','مئة سنة','ألف سنة','أربعين سنة'],'ثلاثمئة سنين وازدادوا تسعًا.'],
+['🐏','في أي سورة جاءت قصة الذبح العظيم؟',['الصافات','النمل','الفيل','الكهف'],'وفديناه بذبحٍ عظيم.'],
+['🐦','في أي سورة جاءت قصة الهدهد؟',['النمل','سبأ','الكهف','الفيل'],'سورة النمل فيها قصة سليمان والنملة والهدهد.'],
+['🐘','ماذا سُمّي العام الذي هاجم فيه أبرهة الكعبة؟',['عام الفيل','عام الحزن','عام الفتح','عام الوفود'],'وفيه وُلد النبي محمد ﷺ.'],
+['🐜','ماذا فعل سليمان بعد أن سمع كلام النملة؟',['تبسّم ضاحكًا وشكر الله','غضب','أمر الجيش بالرجوع','لم يسمعها'],'ودعا الله أن يشكر نعمته.'],
+['🐋','ما لقب يونس الذي ورد في القرآن؟',['ذو النون','ذو القرنين','ذو الكفل','خليل الله'],'النون هو الحوت.'],
+['🐦','ماذا قال الهدهد عن قوم ملكة سبأ؟',['يسجدون للشمس من دون الله','يسجدون للقمر','يعبدون الأصنام الحجرية','يعبدون النار'],'فجاء بالخبر اليقين إلى سليمان.'],
+['🐄','ما أطول سورة في القرآن، وقد سُمّيت باسم حيوان؟',['البقرة','النمل','الفيل','النحل'],'سورة البقرة فيها قصة البقرة.'],
+['🐦‍⬛','بماذا شعر ابن آدم حين رأى الغراب يدفن الغراب؟',['ندم على ما فعل بأخيه','فرح','غضب من الغراب','خاف'],'فأصبح من النادمين.'],
+['🐘','بماذا شبّه القرآن جيش أبرهة بعد العقاب؟',['بعصفٍ مأكول','بالجبال','بالنجوم','بالسراب'],'فجعلهم كعصفٍ مأكول.']]}
+};
+const ORDER=['easy','medium','hard'];
+const SRC={},last={};ORDER.forEach(k=>SRC[k]=LV[k].qs.slice());
+function fy(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const PR=/(?<![\u0621-\u064A])(سليمان|يونس|موسى|نوح|إبراهيم|إسماعيل|يوسف|داود|عيسى)(?![\u0621-\u064A])/g;
+const fmt=t=>t.replace(PR,'$1<small class="pb">(عليه السلام)</small>');
+const DONKEY='<svg viewBox="0 0 100 100" width="84" height="84"><ellipse cx="33" cy="24" rx="8" ry="21" transform="rotate(-15 33 24)" fill="#8a8a98"/><ellipse cx="33" cy="26" rx="4" ry="14" transform="rotate(-15 33 26)" fill="#f3b6c0"/><ellipse cx="67" cy="24" rx="8" ry="21" transform="rotate(15 67 24)" fill="#8a8a98"/><ellipse cx="67" cy="26" rx="4" ry="14" transform="rotate(15 67 26)" fill="#f3b6c0"/><ellipse cx="50" cy="56" rx="26" ry="30" fill="#9b9ba8"/><path d="M42 27Q50 14 58 27Q50 34 42 27Z" fill="#5a5a66"/><ellipse cx="50" cy="77" rx="17" ry="14" fill="#eee6da"/><ellipse cx="43" cy="78" rx="2.6" ry="3.6" fill="#5a5a66"/><ellipse cx="57" cy="78" rx="2.6" ry="3.6" fill="#5a5a66"/><circle cx="39" cy="50" r="4.5" fill="#26244f"/><circle cx="61" cy="50" r="4.5" fill="#26244f"/><circle cx="40.5" cy="48.5" r="1.4" fill="#fff"/><circle cx="62.5" cy="48.5" r="1.4" fill="#fff"/></svg>';
+const icon=e=>e==='🫏'?DONKEY:e==='🐦‍⬛'?'<span style="filter:grayscale(1) brightness(.18)">🐦</span>':e;
+const $=id=>document.getElementById(id);
+let cur,qi,score,ok,streak,locked,timer,tl,mute=false,best={},total=0;
+
+// ---------- sound ----------
+let AC;
+function ac(){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.state==='suspended'&&AC.resume()}catch(e){}return AC}
+function tone(f,d,type='sine',v=.18,at=0){if(mute)return;const a=ac();if(!a)return;const o=a.createOscillator(),g=a.createGain(),t=a.currentTime+at;
+ o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.02);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d+.05)}
+const sfx={
+ click:()=>tone(660,.1,'triangle'),
+ ok:()=>[523,659,784,1047].forEach((f,i)=>tone(f,.22,'triangle',.2,i*.09)),
+ no:()=>{tone(220,.25,'sawtooth',.1);tone(165,.35,'sawtooth',.1,.15)},
+ tick:()=>tone(900,.05,'square',.05),
+ win:()=>[523,659,784,659,784,1047,1319].forEach((f,i)=>tone(f,.3,'triangle',.2,i*.12)),
+ lose:()=>[392,349,330,262].forEach((f,i)=>tone(f,.3,'sine',.18,i*.15))
+};
+$('snd').onclick=()=>{mute=!mute;$('snd').textContent=mute?'🔇':'🔊';if(!mute)sfx.click()};
+
+// ---------- visuals ----------
+(function sky(){const s=$('sky'),e=['🐏','🐦','🐜','🐋','🐘','🐄','🐦','🐕','🌙','⭐'];
+ for(let i=0;i<26;i++){const d=document.createElement('div');d.className='star';d.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*60}%;animation-delay:${Math.random()*2.5}s`;s.appendChild(d)}
+ for(let i=0;i<9;i++){const d=document.createElement('div');d.className='fl';d.textContent=e[i%e.length];d.style.cssText=`left:${5+i*11}%;animation-duration:${16+Math.random()*14}s;animation-delay:${-Math.random()*20}s`;s.appendChild(d)}})();
+const cv=$('cv'),cx=cv.getContext('2d');let P=[],run=false;
+function size(){cv.width=innerWidth;cv.height=innerHeight}size();addEventListener('resize',size);
+function confetti(n=120){const col=['#ff9f43','#2ec4b6','#ff6b6b','#fff1c1','#a855f7','#4a8cff'];
+ for(let i=0;i<n;i++)P.push({x:innerWidth/2,y:innerHeight*.4,vx:(Math.random()-.5)*16,vy:-Math.random()*15-3,s:6+Math.random()*7,c:col[i%6],r:Math.random()*6,l:100+Math.random()*50});
+ if(!run){run=true;loop()}}
+function loop(){cx.clearRect(0,0,cv.width,cv.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.35;p.r+=.2;p.l--;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);cx.restore()});
+ P=P.filter(p=>p.l>0&&p.y<cv.height+20);P.length?requestAnimationFrame(loop):(run=false,cx.clearRect(0,0,cv.width,cv.height))}
+function floatText(t,x,y){const d=document.createElement('div');d.textContent=t;d.style.cssText=`position:fixed;left:${x}px;top:${y}px;font-family:Lalezar;font-size:34px;color:#fff;text-shadow:0 3px 0 #2fbf71;z-index:6;pointer-events:none;transition:all .9s;opacity:1`;
+ document.body.appendChild(d);requestAnimationFrame(()=>{d.style.transform='translateY(-80px)';d.style.opacity='0'});setTimeout(()=>d.remove(),950)}
+
+// ---------- screens ----------
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id===id));scrollTo(0,0)}
+function buildHome(){$('levels').innerHTML=ORDER.map(k=>{const l=LV[k],b=best[k]||0;
+ return `<button class="lv" data-k="${k}" style="background:${l.c}"><span class="ic">${l.ic}</span><span><b>${l.n}</b><span>${l.d}</span></span><span class="best">${'⭐'.repeat(b)||'☆☆☆'}</span></button>`}).join('');
+ document.querySelectorAll('.lv').forEach(b=>b.onclick=()=>{sfx.click();start(b.dataset.k)})}
+const sh=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+
+function start(k){{const a=fy(SRC[k].slice());if(a[0]===last[k]){const j=1+Math.floor(Math.random()*(a.length-1));[a[0],a[j]]=[a[j],a[0]]}last[k]=a[0];LV[k].qs=a}cur=k;qi=0;score=0;ok=0;streak=0;$('lvName').textContent=LV[k].ic+' '+LV[k].n;$('lvName').style.visibility='visible';$('pts').textContent='⭐ 0';show('game');ask()}
+function ask(){locked=false;const l=LV[cur],[e,q,o,f]=l.qs[qi];
+ $('em').innerHTML=icon(e);$('em').style.animation='none';void $('em').offsetWidth;$('em').style.animation='';
+ $('q').innerHTML=fmt(q);$('pg').style.width=(qi/l.qs.length*100)+'%';
+ $('fb').style.display='none';$('nx').style.display='none';
+ $('stk').textContent=streak>1?'🔥 '+streak:'';
+ $('opts').innerHTML='';
+ sh(o.map((t,i)=>({t,c:i===0}))).forEach(x=>{const b=document.createElement('button');b.className='op';b.innerHTML=fmt(x.t);if(x.c)b.dataset.c='1';b.onclick=()=>pick(b,x.c);$('opts').appendChild(b)});
+ clearInterval(timer);
+ if(l.t){tl=l.t;$('tm').style.opacity=1;$('tmi').style.width='100%';const t0=Date.now();
+  timer=setInterval(()=>{const left=l.t-(Date.now()-t0)/1000;tl=left;$('tmi').style.width=Math.max(0,left/l.t*100)+'%';
+   if(left<=5&&Math.ceil(left)!==timer.last){timer.last=Math.ceil(left);sfx.tick()}
+   if(left<=0){clearInterval(timer);pick(null,false,true)}},100)}
+ else $('tm').style.opacity=0}
+function pick(btn,right,timeout){if(locked)return;locked=true;clearInterval(timer);
+ const l=LV[cur],f=l.qs[qi][3],bs=[...document.querySelectorAll('.op')];
+ bs.forEach(b=>{b.disabled=true;if(b.dataset.c)b.classList.add('ok');else if(b!==btn)b.classList.add('dim')});
+ const fb=$('fb');fb.style.display='block';
+ if(right){ok++;streak++;let g=10+(l.t?Math.ceil(tl/4):0)+(streak>2?5:0);score+=g;total+=g;
+  sfx.ok();confetti(60);const r=btn.getBoundingClientRect();floatText('+'+g,r.left+r.width/2-20,r.top);
+  fb.style.display='none';setTimeout(next,1000)}
+ else{streak=0;btn&&btn.classList.add('no');sfx.no();fb.className='bad';fb.innerHTML=`<b>${timeout?'انتهى الوقت ⏰':'لا بأس! 💪'}</b>الإجابة الصحيحة: ${fmt(l.qs[qi][2][0])}.<br>${fmt(f)}`}
+ $('pts').textContent='⭐ '+score;$('tot').textContent='⭐ '+total;$('stk').textContent=streak>1?'🔥 '+streak:'';
+ $('pg').style.width=((qi+1)/l.qs.length*100)+'%';
+ if(!right){$('nx').style.display='block';$('nx').textContent=qi===l.qs.length-1?'النتيجة 🏆':'التالي ◀'}}
+function next(){if(qi<LV[cur].qs.length-1){qi++;ask()}else finish()}
+$('nx').onclick=()=>{sfx.click();next()};
+
+function finish(){const n=LV[cur].qs.length,st=ok>=n-2?3:ok>=Math.ceil(n*.6)?2:1;best[cur]=Math.max(best[cur]||0,st);buildHome();
+ $('lvName').style.visibility='hidden';$('tm').style.opacity=0;
+ $('eT').textContent=st===3?'ممتاز يا بطل! 🏆':st===2?'أحسنت! 👏':'محاولة جميلة! 🌈';
+ $('eS').innerHTML=[1,2,3].map(i=>`<span style="animation-delay:${i*.35}s">${i<=st?'⭐':'☆'}</span>`).join('');
+ $('eM').textContent=`أجبت إجابة صحيحة على ${ok} من ${n} سؤالًا`;$('eP').textContent=`نقاط هذه الجولة: ${score}`;
+ const nx=ORDER[ORDER.indexOf(cur)+1];$('nextLv').style.display=nx?'':'none';
+ show('end');st>1?(sfx.win(),confetti(200),setTimeout(()=>confetti(120),500)):sfx.lose()}
+$('again').onclick=()=>{sfx.click();start(cur)};
+$('nextLv').onclick=()=>{sfx.click();start(ORDER[ORDER.indexOf(cur)+1])};
+$('menu').onclick=()=>{sfx.click();show('home')};
+buildHome();
+</script>
+</body>
+</html>
